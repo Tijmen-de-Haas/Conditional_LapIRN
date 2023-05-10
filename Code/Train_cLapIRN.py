@@ -38,7 +38,7 @@ parser.add_argument("--start_channel", type=int,
                     help="number of start channels")
 parser.add_argument("--datapath", type=str,
                     dest="datapath",
-                    default='../Dataset/Brain_dataset/OASIS/crop_min_max/norm',
+                    default='D:/ismi_data/NLST/imagesTr',
                     help="data path for training images")
 parser.add_argument("--freeze_step", type=int,
                     dest="freeze_step", default=3000,
@@ -75,7 +75,7 @@ def train_lvl1():
         param.volatile = True
 
     # OASIS
-    names = sorted(glob.glob(datapath + '/*.nii'))
+    names = sorted(glob.glob(datapath + '/*.nii.gz'))
 
     grid_4 = generate_grid(imgshape_4)
     grid_4 = torch.from_numpy(np.reshape(grid_4, (1,) + grid_4.shape)).cuda().float()
@@ -85,8 +85,8 @@ def train_lvl1():
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
     model_dir = '../Model/Stage'
 
-    if not os.path.isdir(model_dir):
-        os.mkdir(model_dir)
+    #if not os.path.isdir(model_dir):
+    #    os.mkdir(model_dir)
 
     lossall = np.zeros((4, iteration_lvl1 + 1))
 
