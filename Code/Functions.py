@@ -155,8 +155,8 @@ class Dataset_epoch(Data.Dataset):
         img_A = load_4D(self.index_pair[step][0])
         img_B = load_4D(self.index_pair[step][1])
 
-        # print(self.index_pair[step][0])
-        # print(self.index_pair[step][1])
+        print(self.index_pair[step][0])
+        print(self.index_pair[step][1])
 
         if self.norm:
             return torch.from_numpy(imgnorm(img_A)).float(), torch.from_numpy(imgnorm(img_B)).float()
