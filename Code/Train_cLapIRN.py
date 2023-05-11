@@ -90,7 +90,7 @@ def train_lvl1():
 
     lossall = np.zeros((4, iteration_lvl1 + 1))
 
-    training_generator = Data.DataLoader(Dataset_epoch(names, norm=False), batch_size=1,
+    training_generator = Data.DataLoader(Dataset_epoch(names, norm=True), batch_size=1,
                                          shuffle=True, num_workers=2)
     step = 0
     load_model = False
@@ -379,9 +379,9 @@ def train_lvl3():
     np.save(model_dir + '/loss' + model_name + 'stagelvl3.npy', lossall)
 
 
-imgshape = (160, 192, 144)
-imgshape_4 = (160 / 4, 192 / 4, 144 / 4)
-imgshape_2 = (160 / 2, 192 / 2, 144 / 2)
+imgshape = (224, 192, 224)
+imgshape_4 = (224 / 4, 192 / 4, 224 / 4)
+imgshape_2 = (224 / 2, 192 / 2, 224 / 2)
 
 range_flow = 0.4
 max_smooth = 10.
