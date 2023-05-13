@@ -7,6 +7,7 @@ from datetime import datetime
 import numpy as np
 import torch
 import torch.utils.data as Data
+import multiprocessing
 
 from Functions import generate_grid, Dataset_epoch, Predict_dataset, transform_unit_flow_to_flow_cuda, \
     generate_grid_unit
@@ -83,6 +84,8 @@ def train_lvl1():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
+    save_dir = "../Model/Stage"
+    os.makedirs(save_dir, exist_ok=True)
     model_dir = '../Model/Stage'
 
     #if not os.path.isdir(model_dir):
@@ -107,6 +110,7 @@ def train_lvl1():
 
             X = X.cuda().float()
             Y = Y.cuda().float()
+
             reg_code = torch.rand(1, dtype=X.dtype, device=X.device).unsqueeze(dim=0)
 
             F_X_Y, X_Y, Y_4x, F_xy, _ = model(X, Y, reg_code)
@@ -386,10 +390,13 @@ imgshape_2 = (224 / 2, 192 / 2, 224 / 2)
 range_flow = 0.4
 max_smooth = 10.
 start_t = datetime.now()
-train_lvl1()
-train_lvl2()
-train_lvl3()
-# time
-end_t = datetime.now()
-total_t = end_t - start_t
-print("Time: ", total_t.total_seconds())
+if __name__ == '__main__':
+    multiprocessing.freeze_support()
+    train_lvl1()
+    train_lvl1()
+    train_lvl2()
+    train_lvl3()
+    # time
+    end_t = datetime.now()
+    total_t = end_t - start_t
+    print("Time: ", total_t.total_seconds())

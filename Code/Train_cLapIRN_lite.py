@@ -7,6 +7,7 @@ from datetime import datetime
 import numpy as np
 import torch
 import torch.utils.data as Data
+import multiprocessing
 
 from Functions import generate_grid, Dataset_epoch, Dataset_epoch_validation, transform_unit_flow_to_flow_cuda, \
     generate_grid_unit
@@ -38,7 +39,7 @@ parser.add_argument("--start_channel", type=int,
                     help="number of start channels")
 parser.add_argument("--datapath", type=str,
                     dest="datapath",
-                    default='../Data/OASIS',
+                    default='D:/ismi_data/NLST/imagesTr',
                     help="data path for training images")
 parser.add_argument("--freeze_step", type=int,
                     dest="freeze_step", default=3000,
@@ -56,7 +57,7 @@ iteration_lvl1 = opt.iteration_lvl1
 iteration_lvl2 = opt.iteration_lvl2
 iteration_lvl3 = opt.iteration_lvl3
 
-model_name = "LDR_OASIS_NCC_unit_disp_add_fea4_reg01_10_lite_"
+model_name = "LDR_NLST_NCC_unit_disp_add_fea4_reg01_10_lite_"
 
 def dice(im1, atlas):
     unique_class = np.unique(atlas)
@@ -91,13 +92,15 @@ def train_lvl1():
         param.volatile = True
 
     # OASIS
-    names = sorted(glob.glob(datapath + '/OASIS_OAS1_*_MR1/aligned_norm.nii.gz'))
+    names = sorted(glob.glob(datapath + '/*.nii.gz'))
 
     grid_4 = generate_grid(imgshape_4)
     grid_4 = torch.from_numpy(np.reshape(grid_4, (1,) + grid_4.shape)).cuda().float()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
+    save_dir = "../Model/Stage"
+    os.makedirs(save_dir, exist_ok=True)
     model_dir = '../Model/Stage'
 
     if not os.path.isdir(model_dir):
@@ -197,7 +200,7 @@ def train_lvl2():
         param.volatile = True
 
     # OASIS
-    names = sorted(glob.glob(datapath + '/OASIS_OAS1_*_MR1/aligned_norm.nii.gz'))
+    names = sorted(glob.glob(datapath + '/*.nii.gz'))
 
     grid_2 = generate_grid(imgshape_2)
     grid_2 = torch.from_numpy(np.reshape(grid_2, (1,) + grid_2.shape)).cuda().float()
@@ -310,7 +313,7 @@ def train_lvl3():
         param.volatile = True
 
     # OASIS
-    names = sorted(glob.glob(datapath + '/OASIS_OAS1_*_MR1/aligned_norm.nii.gz'))
+    names = sorted(glob.glob(datapath + '/*.nii.gz'))
 
     # grid = generate_grid(imgshape)
     # grid = torch.from_numpy(np.reshape(grid, (1,) + grid.shape)).cuda().float()
@@ -423,9 +426,10 @@ def train_lvl3():
 
 
 if __name__ == "__main__":
-    imgshape = (160, 192, 224)
-    imgshape_4 = (160 / 4, 192 / 4, 224 / 4)
-    imgshape_2 = (160 / 2, 192 / 2, 224 / 2)
+    multiprocessing.freeze_support()
+    imgshape = (224, 192, 224)
+    imgshape_4 = (224 / 4, 192 / 4, 224 / 4)
+    imgshape_2 = (224 / 2, 192 / 2, 224 / 2)
 
     # Create and initalize log file
     if not os.path.isdir("../Log"):

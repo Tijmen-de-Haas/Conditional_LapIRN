@@ -129,6 +129,7 @@ class Dataset(Data.Dataset):
         index_pair = np.random.permutation(len(self.names)) [0:2]
         img_A = load_4D(self.names[index_pair[0]])
         img_B = load_4D(self.names[index_pair[1]])
+
         if self.norm:
             return torch.from_numpy(imgnorm(img_A)).float(), torch.from_numpy(imgnorm(img_B)).float()
         else:
@@ -143,7 +144,21 @@ class Dataset_epoch(Data.Dataset):
 
         self.names = names
         self.norm = norm
-        self.index_pair = list(itertools.permutations(names, 2))
+        self.index_pair = self.generate_pairs()
+
+  def generate_pairs(self):
+    pairs = []
+    unique_subjects = set()
+    for name in self.names:
+        subject_number = name.split('/')[-1].split('_')[1]
+        if subject_number not in unique_subjects:
+            unique_subjects.add(subject_number)
+            image_0 = name
+            image_1 = name.replace('_0000', '_0001')
+            pair = (image_0, image_1)
+            pairs.append(pair)
+    return pairs
+
 
   def __len__(self):
         'Denotes the total number of samples'
@@ -154,9 +169,6 @@ class Dataset_epoch(Data.Dataset):
         # Select sample
         img_A = load_4D(self.index_pair[step][0])
         img_B = load_4D(self.index_pair[step][1])
-
-        print(self.index_pair[step][0])
-        print(self.index_pair[step][1])
 
         if self.norm:
             return torch.from_numpy(imgnorm(img_A)).float(), torch.from_numpy(imgnorm(img_B)).float()
@@ -240,7 +252,7 @@ if __name__ == '__main__':
     # datapath = '/home/wing/Desktop/registration/miccai2019/data_and_aseg/crop_min_max/norm'
     # names = sorted(glob.glob(datapath + '/*.nii'))[0:255]
     # dataset = Dataset_epoch(names, False)
-    # training_generator = Data.DataLoader(Dataset_epoch(names, norm=False), batch_size=1,
+    # training_generator = SData.DataLoader(Dataset_epoch(names, norm=False), batch_size=1,
     #                                      shuffle=False, num_workers=2)
     # for X, Y in training_generator:
     #     print("---")

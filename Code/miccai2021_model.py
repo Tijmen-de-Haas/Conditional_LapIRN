@@ -459,6 +459,7 @@ class SpatialTransform_unit(nn.Module):
         super(SpatialTransform_unit, self).__init__()
 
     def forward(self, x, flow, sample_grid):
+
         sample_grid = sample_grid + flow
         # size_tensor = sample_grid.size()
         # sample_grid[0, :, :, :, 0] = (sample_grid[0, :, :, :, 0] - (size_tensor[3] / 2)) / size_tensor[3] * 2
